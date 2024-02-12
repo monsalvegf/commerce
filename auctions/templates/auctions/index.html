@@ -2,6 +2,16 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    TODO
+    <ul style="padding-left: 0;">
+        {% for listing in listings %}
+            <li style="border: 1px solid lightgray; padding: 10px; margin-bottom: 10px; list-style-type: none;">
+                <h3><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h3>
+                <p>{{ listing.description }}</p>
+                <p>Current Price: ${{ listing.current_price }}</p>
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="width: auto; max-height: 100px;">
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

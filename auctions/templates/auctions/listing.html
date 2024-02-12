@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container mt-3" style="margin-left: 0;">
+    <h2>Listing: {{ listing.title }}</h2>
+    {% if listing.image_url %}
+        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-height: 200px; width: auto;">
+    {% endif %}
+    <p>{{ listing.description }}</p>
+    <p style="font-size: larger; font-weight: bold;">${{ listing.current_price }}</p>
+    <p>{{ listing.bids.count }} bid(s) so far.
+        {% if listing.current_bid_user %}
+            Your bid is the current bid.
+        {% endif %}
+    </p>
+    <form action="{% url 'listing' listing.id %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="number" class="form-control" id="bid" name="bid" required placeholder="Bid">
+        </div>
+        <button type="submit" class="btn btn-primary">Place Bid</button>
+    </form>
+    
+    
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

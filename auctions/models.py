@@ -12,10 +12,7 @@ class Category(models.Model):
     # Nombre de la categoría
     name = models.CharField(max_length=100)
 
-    # Descripción de la categoría
-    description = models.TextField(blank=True)
-
-    # Métodos adicionales
+     # Métodos adicionales
     def __str__(self):
         return self.name
 
@@ -39,11 +36,16 @@ class Listing(models.Model):
 
     # Fechas de creación y finalización
     created_at = models.DateTimeField(auto_now_add=True)
-    ends_at = models.DateTimeField()
 
+    def current_price(self):
+        highest_bid = self.bids.order_by('-amount').first()
+        if highest_bid is not None:
+            return max(self.starting_bid, highest_bid.amount)
+        return self.starting_bid
+    
     # Métodos adicionales
     def __str__(self):
-        return f"{self.title} - {self.starting_bid}"
+        return f"{self.title}. Created: {self.created_at}. Starting bid: {self.starting_bid}"
 
 
 class Bid(models.Model):
