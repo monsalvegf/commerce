@@ -147,3 +147,11 @@ def category(request, category_id):
     category = Category.objects.get(pk=category_id)
     listings = category.listings.filter(is_active=True)
     return render(request, 'auctions/category.html', {'category': category, 'listings': listings})
+
+
+@login_required
+def close_listing(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    listing.is_active = False
+    listing.save()
+    return redirect(reverse('listing', kwargs={'listing_id': listing.id}))

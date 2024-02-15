@@ -38,6 +38,15 @@
         <button type="submit" class="btn btn-primary">Place Bid</button>
     </form>
     
+    {% if listing.owner.id == user.id %}
+        <form action="{% url 'close_listing' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary mt-2">
+                Close this listing
+            </button>
+        </form>
+    {% endif %}
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert {{ message.tags }}">
