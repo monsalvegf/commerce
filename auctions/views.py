@@ -7,6 +7,8 @@ from django.urls import reverse
 from .models import User, Listing, Category, Bid, Comment, Watchlist
 from .forms import ListingForm
 
+from django.contrib.auth.decorators import login_required
+
 from django.contrib import messages
 
 
@@ -35,6 +37,7 @@ def login_view(request):
         return render(request, "auctions/login.html")
 
 
+@login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
@@ -67,6 +70,7 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required
 def create_listing(request):
     if request.method == 'POST':
         form = ListingForm(request.POST)
@@ -80,6 +84,7 @@ def create_listing(request):
     return render(request, 'auctions/create_listing.html', {'form': form})
 
 
+@login_required
 def listing(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
     highest_bid = listing.bids.order_by('-amount').first()
@@ -87,7 +92,9 @@ def listing(request, listing_id):
         listing.current_bid_user = True
     else:
         listing.current_bid_user = False
-
+    
+    in_watchlist = Watchlist.objects.filter(user=request.user, listing=listing).exists()
+        # Comprueba si el modelo Watchlist relaciona usuarios y listings
 
     if request.method == 'POST':
         bid_amount = float(request.POST.get('bid', 0))  # Obtener 'bid' o 0 si no existe
@@ -106,5 +113,20 @@ def listing(request, listing_id):
         # Nota: Si el bid no es válido, la función continuará para renderizar la página de nuevo con el mensaje de error.
 
     # Para solicitudes GET o después de manejar un POST con errores, simplemente renderiza el template
-    return render(request, 'auctions/listing.html', {'listing': listing})
+    return render(request, 'auctions/listing.html', {'listing': listing, 'in_watchlist': in_watchlist})
 
+
+@login_required
+def add_watchlist(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    watchlist = Watchlist(user=request.user, listing=listing)
+    watchlist.save()
+    return redirect(reverse('listing', kwargs={'listing_id': listing.id}))
+
+
+@login_required
+def remove_watchlist(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    watchlist = Watchlist.objects.filter(user=request.user, listing=listing)
+    watchlist.delete()
+    return redirect(reverse('listing', kwargs={'listing_id': listing.id}))
