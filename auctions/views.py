@@ -130,3 +130,20 @@ def remove_watchlist(request, listing_id):
     watchlist = Watchlist.objects.filter(user=request.user, listing=listing)
     watchlist.delete()
     return redirect(reverse('listing', kwargs={'listing_id': listing.id}))
+
+
+@login_required
+def watchlist(request):
+    watchlist = Watchlist.objects.filter(user=request.user)
+    return render(request, 'auctions/watchlist.html', {'watchlist': watchlist})
+
+
+def categories(request):
+    categories = Category.objects.all()
+    return render(request, 'auctions/categories.html', {'categories': categories})
+
+
+def category(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    listings = category.listings.filter(is_active=True)
+    return render(request, 'auctions/category.html', {'category': category, 'listings': listings})
