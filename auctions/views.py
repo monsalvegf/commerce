@@ -155,3 +155,30 @@ def close_listing(request, listing_id):
     listing.is_active = False
     listing.save()
     return redirect(reverse('listing', kwargs={'listing_id': listing.id}))
+
+
+@login_required
+def user_activities(request):
+    # Obtener todas las ofertas del usuario y ordenarlas por la fecha de la oferta
+    user_bids = Bid.objects.filter(bidder=request.user).select_related('listing').order_by('-bid_time')
+
+    # Crear un conjunto ordenado para almacenar los listados sin duplicados, manteniendo el orden de las ofertas más recientes
+    participated_listings = []
+    listed_listings_ids = set()
+    for bid in user_bids:
+        if bid.listing.id not in listed_listings_ids:
+            participated_listings.append(bid.listing)
+            listed_listings_ids.add(bid.listing.id)
+
+    return render(request, 'auctions/user_activities.html', {
+        'participated_listings': participated_listings,
+    })
+
+
+@login_required
+def add_comment(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    comment = request.POST.get('comment')
+    new_comment = Comment(listing=listing, commenter=request.user, content=comment)
+    new_comment.save()
+    return redirect(reverse('listing', kwargs={'listing_id': listing.id}))

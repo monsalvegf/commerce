@@ -19,10 +19,11 @@
             </button>
         </form>
     {% endif %}
-
+    <br>
     {% if listing.image_url %}
         <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-height: 200px; width: auto;">
     {% endif %}
+    <br>
     <p>{{ listing.description }}</p>
     <p style="font-size: larger; font-weight: bold;">${{ listing.current_price }}</p>
     <p>{{ listing.bids.count }} bid(s) so far.
@@ -30,6 +31,7 @@
             Your bid is the current bid.
         {% endif %}
     </p>
+    {% if listing.is_active%}
     <form action="{% url 'listing' listing.id %}" method="post">
         {% csrf_token %}
         <div class="form-group">
@@ -37,8 +39,15 @@
         </div>
         <button type="submit" class="btn btn-primary">Place Bid</button>
     </form>
+    {% else%}
+        <p>This listing is closed.</p>
+    {% endif %}
+
+    {% if listing.current_bid_user and not listing.is_active%}
+        <p>You have won this auction.</p>
+    {% endif %}
     
-    {% if listing.owner.id == user.id %}
+    {% if listing.owner.id == user.id and listing.is_active%}
         <form action="{% url 'close_listing' listing.id %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary mt-2">
@@ -54,6 +63,26 @@
             </div>
         {% endfor %}
     {% endif %}
-
+    <hr>
+    <h3>Comments</h3>
+    <form action="{% url 'add_comment' listing.id %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <textarea class="form-control" id="comment" name="comment" required placeholder="Comment"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </form>
+    <ul class="list-group mt-2">
+        {% for comment in listing.comments.all %}
+            <li class="list-group-item">
+                <!-- Mostrar fecha y nombre del comentarista en la misma línea -->
+                <p><strong>{{ comment.comment_time|date:"F d, Y H:i" }}</strong> by <strong>{{ comment.commenter.username }}</strong></p>
+                <!-- Contenido del comentario debajo -->
+                <p>{{ comment.content }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    
+    
 </div>
 {% endblock %}

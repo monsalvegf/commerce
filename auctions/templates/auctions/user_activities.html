@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Your Bids  </h2>
+
+    {% if participated_listings %}
+        <div>
+            <h3>Auctions You've Participated In</h3>
+            <ul>
+                {% for listing in participated_listings %}
+                    <li>
+                        <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a> - 
+                        {% if listing.is_active %}
+                            Open
+                        {% else %}
+                            Closed
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <p>No has participado en ninguna subasta aún.</p>
+    {% endif %}
+
+
+{% endblock %}

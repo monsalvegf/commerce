@@ -45,7 +45,7 @@ class Listing(models.Model):
     
     # Métodos adicionales
     def __str__(self):
-        return f"{self.title}. Created: {self.created_at}. Starting bid: {self.starting_bid}"
+        return f"{self.title}. Created by {self.owner} at {self.created_at}. Starting bid: {self.starting_bid}. Status: {self.is_active}"
 
 
 class Bid(models.Model):
@@ -100,3 +100,5 @@ class Watchlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s watchlist - {self.listing.title}"
+
+
