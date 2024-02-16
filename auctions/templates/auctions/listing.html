@@ -3,7 +3,12 @@
 {% block body %}
 <div class="container mt-3" style="margin-left: 0;">
     <h2>Listing: {{ listing.title }}</h2>
-
+    <div class="details-section mt-3">
+        <div class="details mt-3">
+            <p><strong>Listed by:</strong> {{ listing.owner.username }}</p>
+            <p><strong>Category:</strong> {% if listing.category %}{{ listing.category.name }}{% else %}No Category Listed{% endif %}</p>
+        </div>
+    </div>
     {% if in_watchlist %}
         <form action="{% url 'remove_watchlist' listing.id %}" method="post">
             {% csrf_token %}
